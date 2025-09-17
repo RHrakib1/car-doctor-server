@@ -2,7 +2,8 @@ const express = require('express')
 const cors = require('cors')
 const app = express()
 const port = process.env.PORT || 5000
-const { MongoClient, ServerApiVersion } = require('mongodb');
+require('dotenv').config();
+const { MongoClient, ServerApiVersion, ObjectId, } = require('mongodb');
 
 
 //middelware
@@ -31,6 +32,24 @@ async function run() {
         await client.connect();
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
+
+        const serviceCollection = client.db('car-doctor').collection('carDoctorCollection')
+
+        app.get('/services', async (req, res) => {
+            const quary = serviceCollection.find()
+            const result = await quary.toArray()
+            res.send(result)
+        })
+
+        app.get('/services/:id', async (req, res) => {
+            const id = req.params.id
+            const quary = { _id: new ObjectId(id) }
+            const options = {
+                projection: { title: 1, price: 1, service_id: 1 },
+            }
+            const result = await serviceCollection.findOne(quary, options)
+            res.send(result)
+        })
 
 
 
