@@ -61,7 +61,6 @@ async function run() {
             const databody = req.body
             const result = await bookingCollection.insertOne(databody)
             res.send(result)
-
         })
 
         app.get('/booking', async (req, res) => {
