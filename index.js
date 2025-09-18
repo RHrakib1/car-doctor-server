@@ -34,7 +34,10 @@ async function run() {
         await client.db("admin").command({ ping: 1 });
 
         const serviceCollection = client.db('car-doctor').collection('carDoctorCollection')
+        const bookingCollection = client.db('car-doctor').collection('carDoctorServices')
 
+
+        // serviceCollection
         app.get('/services', async (req, res) => {
             const quary = serviceCollection.find()
             const result = await quary.toArray()
@@ -45,9 +48,29 @@ async function run() {
             const id = req.params.id
             const quary = { _id: new ObjectId(id) }
             const options = {
-                projection: { title: 1, price: 1, service_id: 1 },
+                projection: { title: 1, price: 1, service_id: 1, img: 1 },
             }
             const result = await serviceCollection.findOne(quary, options)
+            res.send(result)
+        })
+
+
+
+        // bookingCollection
+        app.post('/booking', async (req, res) => {
+            const databody = req.body
+            const result = await bookingCollection.insertOne(databody)
+            res.send(result)
+
+        })
+
+        app.get('/booking', async (req, res) => {
+            console.log(req.query)
+            let query = {};
+            if (req.query?.email) {
+                query = { email: req.query.email }
+            }
+            const result = await bookingCollection.find(query).toArray()
             res.send(result)
         })
 
